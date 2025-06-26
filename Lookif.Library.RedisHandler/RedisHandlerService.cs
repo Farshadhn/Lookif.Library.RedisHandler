@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using StackExchange.Redis;
 using System.Text.RegularExpressions;
 using static Newtonsoft.Json.JsonConvert;
@@ -29,20 +30,38 @@ namespace Lookif.Library.RedisHandler
         // Generic AddKeyAsync<T>
         public async Task AddAsync<T>(string key, T value, int? ttlMinutes = null)
         {
-            var json = SerializeObject(value);
+            var json = SerializeObject(value, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
             await _db.StringSetAsync(key, json, ttlMinutes.HasValue ? TimeSpan.FromMinutes(ttlMinutes.Value) : (TimeSpan?)null);
         }
         public async Task AddAsync<T>(string key, List<T> value, int? ttlMinutes = null)
         {
-            var json = SerializeObject(value);
-            await _db.StringSetAsync(key, json, ttlMinutes.HasValue ? TimeSpan.FromMinutes(ttlMinutes.Value) : (TimeSpan?)null);
+            try
+            {
+                var json = SerializeObject(value, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+                await _db.StringSetAsync(key, json, ttlMinutes.HasValue ? TimeSpan.FromMinutes(ttlMinutes.Value) : (TimeSpan?)null);
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+          
         }
         // Generic AddKeysAsync<T>
         public async Task AddAsync<T>(Dictionary<string, T> keyValues, int? ttlMinutes = null)
         {
             foreach (var kv in keyValues)
             {
-                var json = SerializeObject(kv.Value);
+                var json = SerializeObject(kv.Value, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
                 await _db.StringSetAsync(kv.Key, json, ttlMinutes.HasValue ? TimeSpan.FromMinutes(ttlMinutes.Value) : (TimeSpan?)null);
             }
         }
