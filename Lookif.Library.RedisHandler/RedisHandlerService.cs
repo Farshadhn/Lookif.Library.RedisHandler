@@ -77,7 +77,21 @@ namespace Lookif.Library.RedisHandler
                 await RemoveAsync(matchedKeys);
             }
         }
+        public async Task RemoveByPrefixAsync(string prefix)
+        {
+            var endpoints = _db.Multiplexer.GetEndPoints();
+            var server = _db.Multiplexer.GetServer(endpoints.First());
 
+            // Use the SCAN pattern to avoid loading all keys at once
+            var allKeys = server.Keys(_db.Database, pattern: $"{prefix}*");
+
+            var keyList = allKeys.Select(k => (string)k).ToArray();
+
+            if (keyList.Length > 0)
+            {
+                await RemoveAsync(keyList);
+            }
+        }
         // 4. Read Key or Keys
         public async Task<string?> ReadAsync(string key)
         {
