@@ -1,11 +1,6 @@
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Text.Json;
-
+using static Newtonsoft.Json.JsonConvert;
 namespace Lookif.Library.RedisHandler
 {
     public class RedisHandlerService
@@ -34,12 +29,12 @@ namespace Lookif.Library.RedisHandler
         // Generic AddKeyAsync<T>
         public async Task AddAsync<T>(string key, T value, int? ttlMinutes = null)
         {
-            var json = JsonSerializer.Serialize(value);
+            var json = SerializeObject(value);
             await _db.StringSetAsync(key, json, ttlMinutes.HasValue ? TimeSpan.FromMinutes(ttlMinutes.Value) : (TimeSpan?)null);
         }
         public async Task AddAsync<T>(string key, List<T> value, int? ttlMinutes = null)
         {
-            var json = JsonSerializer.Serialize(value);
+            var json = SerializeObject(value);
             await _db.StringSetAsync(key, json, ttlMinutes.HasValue ? TimeSpan.FromMinutes(ttlMinutes.Value) : (TimeSpan?)null);
         }
         // Generic AddKeysAsync<T>
@@ -47,7 +42,7 @@ namespace Lookif.Library.RedisHandler
         {
             foreach (var kv in keyValues)
             {
-                var json = JsonSerializer.Serialize(kv.Value);
+                var json = SerializeObject(kv.Value);
                 await _db.StringSetAsync(kv.Key, json, ttlMinutes.HasValue ? TimeSpan.FromMinutes(ttlMinutes.Value) : (TimeSpan?)null);
             }
         }
@@ -116,13 +111,13 @@ namespace Lookif.Library.RedisHandler
         {
             var value = await _db.StringGetAsync(key);
             if (!value.HasValue) return default;
-            return JsonSerializer.Deserialize<T>(value);
+            return DeserializeObject<T>(value);
         }
         public async Task<List<T>> ReadListAsync<T>(string key)
         {
             var value = await _db.StringGetAsync(key);
             if (!value.HasValue) return Enumerable.Empty<T>().ToList();
-            return JsonSerializer.Deserialize<List<T>>(value);
+            return DeserializeObject<List<T>>(value);
         }
         // Generic ReadKeysAsync<T>
         public async Task<Dictionary<string, T>> ReadAsync<T>(IEnumerable<string> keys)
@@ -134,7 +129,7 @@ namespace Lookif.Library.RedisHandler
             {
                 if (values[i].HasValue)
                 {
-                    var obj = JsonSerializer.Deserialize<T>(values[i]);
+                    var obj = DeserializeObject<T>(values[i]);
                     if (obj != null)
                         result[(string)redisKeys[i]] = obj;
                 }
@@ -174,7 +169,7 @@ namespace Lookif.Library.RedisHandler
                 var value = await _db.StringGetAsync(key);
                 if (value.HasValue)
                 {
-                    var obj = JsonSerializer.Deserialize<T>(value);
+                    var obj = DeserializeObject<T>(value);
                     if (obj != null)
                         result[key] = obj;
                 }
