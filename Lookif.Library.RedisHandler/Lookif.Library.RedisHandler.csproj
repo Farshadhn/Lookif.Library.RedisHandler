@@ -14,17 +14,32 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>redis;cache;lookif</PackageTags>
 		<NeutralLanguage>fa-IR</NeutralLanguage>
+		         <IncludeContentInPack>true</IncludeContentInPack>
+
 		<PackageLicenseFile>License.txt</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<PackageReadmeFile>Readme.md</PackageReadmeFile>
-		<AssemblyVersion>1.0.0</AssemblyVersion>
-		<FileVersion>1.0.0</FileVersion>
-		<Version>1.0.0</Version>
+		<AssemblyVersion>1.0.1</AssemblyVersion>
+		<FileVersion>1.0.1</FileVersion>
+		<Version>1.0.1</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
 		<PackageReference Include="StackExchange.Redis" Version="2.8.41" />
 	</ItemGroup>
+
+	 <ItemGroup>
+        <None Include="License.txt">
+            <Pack>true</Pack>
+            <PackagePath></PackagePath>
+            <Visible>True</Visible>
+        </None>
+	       <None Include="Readme.md">
+            <Pack>true</Pack>
+            <PackagePath></PackagePath>
+            <Visible>True</Visible>
+        </None>
+    </ItemGroup>
 
 </Project>
